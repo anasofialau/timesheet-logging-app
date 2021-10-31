@@ -1,0 +1,2 @@
+module TimeLogHelper
+end
