@@ -5,6 +5,6 @@ Rails.application.routes.draw do
   get 'time_logs/clock_in'
   get 'time_logs/clock_out'
 
-  # put 'time_logs/:id'
+  resources :time_logs, only: [:update]
 
 end

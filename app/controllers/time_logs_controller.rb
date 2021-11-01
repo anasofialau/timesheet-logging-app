@@ -1,7 +1,6 @@
 class TimeLogsController < ApplicationController
-  def index
-  end
-  
+  skip_before_action :verify_authenticity_token
+
   def all_time_logs
     time_logs = TimeLog.all.order('created_at desc')
     render json: { data: time_logs }
@@ -20,10 +19,9 @@ class TimeLogsController < ApplicationController
   end
 
   def update
-    puts "UPDATING"
-    log = TimeLog.find(params["log_id"])
-    log.started_at = params["started_at"]
-    log.ended_at = params["ended_at"]
+    log = TimeLog.find(params["id"])
+    log.started_at = params["time_log"]["started_at"]
+    log.ended_at = params["time_log"]["ended_at"]
     log.save
     render json: { data: log }
   end

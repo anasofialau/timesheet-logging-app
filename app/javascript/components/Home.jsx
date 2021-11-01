@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Loader from './Loader';
-// import Pending from './Pending';
-// import Completed from './Completed';
+import DateTimePicker from 'react-datetime-picker'
+import Modal from 'react-modal';
 
 const Home  = () => {
   const [timeLogs, setTimeLogs] = useState({});
   const [loading, setLoading] = useState(true);
   const [isTimeRunning, setIsTimeRunning] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [logToEdit, setLogToEdit] = useState({});
 
   useEffect(() => {
     const url = "time_logs/all_time_logs";
@@ -38,7 +40,7 @@ const Home  = () => {
       setIsTimeRunning(true)
     })
     .catch(() => console.log('An error occurred while fetching the time entries'));
-  }
+  };
 
   const clockOut = () => {
     const url = "time_logs/clock_out?log_id=" + timeLogs[0]?.id;
@@ -53,7 +55,67 @@ const Home  = () => {
       setIsTimeRunning(false)
     })
     .catch(() => console.log('An error occurred while fetching the time entries'));
+  };
+
+  const formatTimestampDate = (date) => {
+    if (date != undefined) {
+      let d = new Date(date);
+      return d.toLocaleString()
+    }
+  };
+
+  const editLog = () => {
+    console.log(logToEdit)
+    const url = "time_logs/" + logToEdit.id;
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ time_log: logToEdit })
+  };
+    fetch(url, requestOptions)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error("Network response was not ok.");
+    })
+    .then(response => {
+      stopEditing()
+    })
+    .catch(() => console.log('An error occurred while fetching the time entries'));
+  };
+
+  const startEditing = (log) => {
+    setLogToEdit(log);
+    setIsModalOpen(true);
   }
+
+  function stopEditing() {
+    setIsModalOpen(false);
+  }
+
+  function setStartedAtForLogToEdit(e) {
+    let log = logToEdit;
+    log.started_at = e;
+    setLogToEdit(log);
+  }
+
+  function setEndedAtForLogToEdit(e) {
+    let log = logToEdit;
+    log.ended_at = e;
+    setLogToEdit(log);
+  }
+
+  const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+    },
+  };
 
   return (
     <div className="d-flex">
@@ -72,6 +134,32 @@ const Home  = () => {
         <p className="lead">
           List of time entries.
         </p>
+
+        <Modal
+          isOpen={isModalOpen}
+          ariaHideApp={false}
+          style={customStyles}
+        >
+          <h2>Edit Time Log</h2>
+          <div>
+            <div>Started at</div>
+            <DateTimePicker
+              onChange={(e) => setStartedAtForLogToEdit(e)}
+              value={new Date(logToEdit.started_at)}
+            />
+          </div>
+          <div>
+            <div>Ended at</div>
+            <DateTimePicker
+              onChange={(e) => setEndedAtForLogToEdit(e)}
+              value={new Date(logToEdit.ended_at)}
+            />
+          </div>
+          <br/>
+          <button className="btn btn-primary" onClick={stopEditing}>Close</button>
+          <button className="btn btn-primary" onClick={() => editLog()}>Edit</button>
+        </Modal>
+        
         {
           loading ? <Loader /> : (
             <div>
@@ -81,14 +169,18 @@ const Home  = () => {
                     <th scope="col">#</th>
                     <th scope="col">Clocked In</th>
                     <th scope="col">Clocked Out</th>
+                    <th scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {timeLogs.map((log) =>
                     <tr key={log.id}>
                       <th scope="row">{log.id}</th>
-                      <td>{log.started_at}</td>
-                      <td>{log.ended_at}</td>
+                      <td>{formatTimestampDate(log.started_at)}</td>
+                      <td>{formatTimestampDate(log.ended_at)}</td>
+                      <td>
+                        <button className="btn btn-primary" onClick={() => startEditing(log)}>Edit</button>
+                      </td>
                     </tr>
                   )}  
                 </tbody>
