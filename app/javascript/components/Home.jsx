@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Loader from './Loader';
 import DateTimePicker from 'react-datetime-picker'
 import Modal from 'react-modal';
-import '../packs/src/DatePicker.css'
 
 const Home  = () => {
   const [timeLogs, setTimeLogs] = useState({});
