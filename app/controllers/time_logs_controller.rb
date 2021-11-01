@@ -7,13 +7,14 @@ class TimeLogsController < ApplicationController
   end
 
   def clock_in
-    log = TimeLog.create(started_at: Time.now)
+    log = TimeLog.create(started_at: Time.now, username: params["username"])
     render json: { data: log }
   end
 
   def clock_out
     log = TimeLog.find(params["log_id"])
     log.ended_at = Time.now
+    log.username = params["username"]
     log.save!
     render json: { data: log }
   end
@@ -22,7 +23,10 @@ class TimeLogsController < ApplicationController
     log = TimeLog.find(params["id"])
     log.started_at = params["time_log"]["started_at"]
     log.ended_at = params["time_log"]["ended_at"]
-    log.save
-    render json: { data: log }
+    if log.save!
+      render json: { data: log }
+    else
+      render json: { errors: log.errors }
+    end
   end
 end

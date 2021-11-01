@@ -1,24 +1,14 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Please describe your process for approaching the code challenge. What kind of planning
+did you do? Did your plans change as you began coding?
 
-Things you may want to cover:
+Describe the schema design you chose. Why did you choose this design? What other
+alternatives did you consider?
+
+If you were given another day to work on this, how would you spend it? What if you were
+given a month?
 
 * Ruby version
+ruby '2.6.6'
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...

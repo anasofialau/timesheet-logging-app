@@ -9,6 +9,7 @@ const Home  = () => {
   const [isTimeRunning, setIsTimeRunning] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [logToEdit, setLogToEdit] = useState({});
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     const url = "time_logs/all_time_logs";
@@ -28,33 +29,52 @@ const Home  = () => {
   }, [isTimeRunning]);
 
   const clockIn = () => {
-    const url = "time_logs/clock_in";
-    fetch(url)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Network response was not ok.");
-    })
-    .then(response => {
-      setIsTimeRunning(true)
-    })
-    .catch(() => console.log('An error occurred while fetching the time entries'));
+    if (username != "") {
+      const url = "time_logs/clock_in";
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username })
+      };
+      fetch(url, requestOptions)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then(response => {
+        setIsTimeRunning(true)
+      })
+      .catch(() => console.log('An error occurred while clocking in.'));
+    } else {
+      alert("Please enter the username in order to clock in/out")
+    }
   };
 
   const clockOut = () => {
-    const url = "time_logs/clock_out?log_id=" + timeLogs[0]?.id;
-    fetch(url)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Network response was not ok.");
-    })
-    .then(response => {
-      setIsTimeRunning(false)
-    })
-    .catch(() => console.log('An error occurred while fetching the time entries'));
+    if (username != "") {
+      const url = "time_logs/clock_out?log_id=" + timeLogs[0]?.id;
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username })
+      };
+      fetch(url, requestOptions)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then(response => {
+        setIsTimeRunning(false)
+      })
+      .catch(() => console.log('An error occurred while clocking out.'));
+    } else {
+      alert("Please enter the username in order to clock in/out")
+    }
+   
   };
 
   const formatTimestampDate = (date) => {
@@ -65,24 +85,27 @@ const Home  = () => {
   };
 
   const editLog = () => {
-    console.log(logToEdit)
-    const url = "time_logs/" + logToEdit.id;
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ time_log: logToEdit })
-  };
-    fetch(url, requestOptions)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Network response was not ok.");
-    })
-    .then(response => {
-      stopEditing()
-    })
-    .catch(() => console.log('An error occurred while fetching the time entries'));
+    if (username != "") {
+      const url = "time_logs/" + logToEdit.id;
+      const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ time_log: logToEdit, username: username })
+      };
+      fetch(url, requestOptions)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then(response => {
+        stopEditing()
+      })
+      .catch(() => alert('An error occurred while updating the time entries. Please check the clock in/out entries'));
+    } else {
+      alert("Please enter the username in order to clock in/out")
+    }
   };
 
   const startEditing = (log) => {
@@ -129,6 +152,10 @@ const Home  = () => {
             Clock Out
           </button>
         </div>
+        <br/> 
+        <label htmlFor="username">Username</label>
+        <br/> 
+        <input name="username" value={username} onChange={(e) => setUsername(e.target.value)}/>
         
         <hr/>
         <p className="lead">
