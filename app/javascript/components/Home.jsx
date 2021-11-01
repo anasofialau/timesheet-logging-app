@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Loader from './Loader';
-import DateTimePicker from 'react-datetime-picker'
 import Modal from 'react-modal';
-import "react-datepicker/dist/react-datepicker.css";
 
 const Home  = () => {
   const [timeLogs, setTimeLogs] = useState({});
@@ -85,6 +83,13 @@ const Home  = () => {
     }
   };
 
+  const formatDates = (date) => {
+    if (date != undefined) {
+      let d = new Date(date)
+      return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay() + "T" + d.getHours() + ":" + d.getMinutes();
+    }
+  };
+
   const editLog = () => {
     if (username != "") {
       const url = "time_logs/" + logToEdit.id;
@@ -120,13 +125,13 @@ const Home  = () => {
 
   function setStartedAtForLogToEdit(e) {
     let log = logToEdit;
-    log.started_at = e;
+    log.started_at = e.target.value;
     setLogToEdit(log);
   }
 
   function setEndedAtForLogToEdit(e) {
     let log = logToEdit;
-    log.ended_at = e;
+    log.ended_at = e.target.value;
     setLogToEdit(log);
   }
 
@@ -159,17 +164,11 @@ const Home  = () => {
           <h2>Edit Time Log</h2>
           <div>
             <div>Started at</div>
-            <DateTimePicker
-              onChange={(e) => setStartedAtForLogToEdit(e)}
-              value={new Date(logToEdit.started_at)}
-            />
+            <input type="datetime-local" value={formatDates(logToEdit.started_at)} onChange={(e) => setStartedAtForLogToEdit(e)}/>
           </div>
           <div>
             <div>Ended at</div>
-            <DateTimePicker
-              onChange={(e) => setEndedAtForLogToEdit(e)}
-              value={new Date(logToEdit.ended_at)}
-            />
+            <input type="datetime-local" value={formatDates(logToEdit.ended_at)} onChange={(e) => setEndedAtForLogToEdit(e)}/>
           </div>
           <br/>
           <button className="btn btn-primary" onClick={stopEditing}>Close</button>
